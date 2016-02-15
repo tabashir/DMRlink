@@ -125,7 +125,7 @@ class ambeIPSC(IPSC):
             _value = config.get(sec, opt).split(None)[0]            # Get the value from the named section
         except ConfigParser.NoOptionError as e:
             try:
-                _value = config.get('SETTINGS', opt).split(None)[0] # Try the global SETTINGS section
+                _value = config.get('DEFAULTS', opt).split(None)[0] # Try the global DEFAULTS section
             except ConfigParser.NoOptionError as e:
                 _value = defaultValue                               # Not found anywhere, use the default value
         logger.info(opt + ' = ' + str(_value))
@@ -136,7 +136,7 @@ class ambeIPSC(IPSC):
         try:
             config.read(configFileName)
             
-            sec = self.defaultOption(config, 'SETTINGS', 'section', 'SETTINGS')
+            sec = self.defaultOption(config, 'DEFAULTS', 'section', 'DEFAULTS')
             self._debug = bool(self.defaultOption(config, sec,'debug', self._debug) == 'True')
             self._outToFile = bool(self.defaultOption(config, sec,'outToFile', self._outToFile) == 'True')
             self._outToUDP = bool(self.defaultOption(config, sec,'outToUDP', self._outToUDP) == 'True')
