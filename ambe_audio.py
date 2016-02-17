@@ -142,10 +142,10 @@ class ambeIPSC(IPSC):
             self._outToUDP = bool(self.defaultOption(config, sec,'outToUDP', self._outToUDP) == 'True')
 
             self._gateway = self.defaultOption(config, sec,'gateway', self._gateway)
-            self._gateway_port = int(self.defaultOption(config, sec,'gatewayPort', self._gateway_port))
+            self._gateway_port = int(self.defaultOption(config, sec,'toGatewayPort', self._gateway_port))
 
             self._remote_control_port = int(self.defaultOption(config, sec,'remoteControlPort', self._remote_control_port))
-            self._ambeRxPort = int(self.defaultOption(config, sec,'ambeRxPort', self._ambeRxPort))
+            self._ambeRxPort = int(self.defaultOption(config, sec,'fromGatewayPort', self._ambeRxPort))
             self._gateway_dmr_id = int(self.defaultOption(config, sec, 'gatewayDmrId', self._gateway_dmr_id))
 
             _tgs = self.defaultOption(config, sec,'tgFilter', str(self._tg_filter).strip('[]'))
