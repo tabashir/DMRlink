@@ -86,7 +86,7 @@ class ambeIPSC(IPSC):
         #
 
         self._currentTG = self._no_tg
-        self.readConfigFile(self._configFile)
+        self.readConfigFile(self._configFile, None, str(args[0]))
     
         logger.info('DMRLink ambe server')
         if self._gateway_dmr_id == 0:
@@ -131,12 +131,16 @@ class ambeIPSC(IPSC):
         logger.info(opt + ' = ' + str(_value))
         return _value
 
-    def readConfigFile(self, configFileName):
+    def readConfigFile(self, configFileName, sec, networkName='DEFAULTS'):
         config = ConfigParser.ConfigParser()
         try:
             config.read(configFileName)
             
-            sec = self.defaultOption(config, 'DEFAULTS', 'section', 'DEFAULTS')
+            if sec == None:
+                sec = self.defaultOption(config, 'DEFAULTS', 'section', networkName)
+            if config.has_section(sec) == False:
+                logger.error('Section ' + sec + ' was not found, using DEFAULTS')
+                sec = 'DEFAULTS'
             self._debug = bool(self.defaultOption(config, sec,'debug', self._debug) == 'True')
             self._outToFile = bool(self.defaultOption(config, sec,'outToFile', self._outToFile) == 'True')
             self._outToUDP = bool(self.defaultOption(config, sec,'outToUDP', self._outToUDP) == 'True')
@@ -450,9 +454,13 @@ class ambeIPSC(IPSC):
 
     #
     # Remote control thread
-    # Use netcat to dynamically change the TGs that are forwarded to Allstar
-    # echo -n "tgs=x,y,z" | nc 127.0.0.1 1235
-    # echo -n "reread_subscribers" | nc 127.0.0.1 1235
+    # Use netcat to dynamically change ambe_audio without a restart
+    # echo -n "tgs=x,y,z" | nc 127.0.0.1 31002
+    # echo -n "reread_subscribers" | nc 127.0.0.1 31002
+    # echo -n "reread_config" | nc 127.0.0.1 31002
+    # echo -n "txTg=##" | nc 127.0.0.1 31002
+    # echo -n "txTs=#" | nc 127.0.0.1 31002
+    # echo -n "section=XX" | nc 127.0.0.1 31002
     #
     def remote_control(self, port):
         s = socket.socket()         # Create a socket object
@@ -472,7 +480,13 @@ class ambeIPSC(IPSC):
                 if _cmd == 'reread_subscribers':
                     reread_subscribers()
                 elif _cmd == 'reread_config':
-                    self.readConfigFile(self._configFile)
+                    self.readConfigFile(self._configFile, None)
+                elif _cmd == 'txTg':
+                    _tx_tg = hex_str_3(int(_tmp.split('=')[1]))
+                elif _cmd == 'txTs':
+                    _tx_ts = int(_tmp.split('=')[1])
+                elif _cmd == 'section':
+                    self.readConfigFile(self._configFile, _tmp.split('=')[1])
                 elif _cmd == 'playbackFromFile':
                     self.playbackFromFile('ambe.bin')                
                 elif _cmd == 'tgs':
