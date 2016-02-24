@@ -72,7 +72,8 @@ class ambeIPSC(IPSC):
 
     _tx_tg = hex_str_3(9998)                            # Hard code the destination TG.  This ensures traffic will not show up on DMR-MARC
     _tx_ts = 2                                          # Time Slot 2
-
+    _currentNetwork = ""
+    
     ###### DEBUGDEBUGDEBUG
     #_d = None
     ###### DEBUGDEBUGDEBUG
@@ -86,7 +87,8 @@ class ambeIPSC(IPSC):
         #
 
         self._currentTG = self._no_tg
-        self.readConfigFile(self._configFile, None, str(args[0]))
+        self._currentNetwork = str(args[0])
+        self.readConfigFile(self._configFile, None, self._currentNetwork)
     
         logger.info('DMRLink ambe server')
         if self._gateway_dmr_id == 0:
@@ -480,13 +482,18 @@ class ambeIPSC(IPSC):
                 if _cmd == 'reread_subscribers':
                     reread_subscribers()
                 elif _cmd == 'reread_config':
-                    self.readConfigFile(self._configFile, None)
+                    self.readConfigFile(self._configFile, None, self._currentNetwork)
                 elif _cmd == 'txTg':
-                    _tx_tg = hex_str_3(int(_tmp.split('=')[1]))
+                    self._tx_tg = hex_str_3(int(_tmp.split('=')[1]))
+                    print('New txTg = ' + str(int_id(self._tx_tg)))
                 elif _cmd == 'txTs':
-                    _tx_ts = int(_tmp.split('=')[1])
+                    self._tx_ts = int(_tmp.split('=')[1])
+                    print('New txTs = ' + str(self._tx_ts))
                 elif _cmd == 'section':
                     self.readConfigFile(self._configFile, _tmp.split('=')[1])
+                elif _cmd == 'gateway_dmr_id':
+                    self._gateway_dmr_id = int(_tmp.split('=')[1])
+                    print('New gateway_dmr_id = ' + str(self._gateway_dmr_id))
                 elif _cmd == 'playbackFromFile':
                     self.playbackFromFile('ambe.bin')                
                 elif _cmd == 'tgs':
