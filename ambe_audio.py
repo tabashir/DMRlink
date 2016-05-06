@@ -17,19 +17,18 @@ from bitstring import BitArray
 import sys, socket, ConfigParser, thread, traceback
 import cPickle as pickle
 from dmrlink import IPSC, NETWORK, networks, logger, int_id, hex_str_3, hex_str_4, get_info, talkgroup_ids, peer_ids, PATH, get_subscriber_info, reread_subscribers
-from time import time, sleep, clock
+from time import time, sleep, clock, localtime, strftime
 import csv
 import struct
 from random import randint
 
 __author__ = 'Cortney T. Buffington, N0MJS'
-__copyright__ = 'Copyright (c) 2015 Cortney T. Buffington, N0MJS and the K0USY Group'
-__credits__ = 'Adam Fast, KC0YLK; Robert Garcia, N5QM'
+__copyright__ = 'Copyright (c) 2013 - 2016 Cortney T. Buffington, N0MJS and the K0USY Group'
+__credits__ = 'Adam Fast, KC0YLK; Dave Kierzkowski, KD8EYF; Robert Garcia, N5QM; Steve Zingman, N4IRS; Mike Zingman, N4IRR'
 __license__ = 'Creative Commons Attribution-ShareAlike 3.0 Unported'
 __maintainer__ = 'Cort Buffington, N0MJS'
-__version__ = '0.1a'
 __email__ = 'n0mjs@me.com'
-__status__ = 'pre-alpha'
+__status__ = 'beta'
 
 
 try:
@@ -73,6 +72,7 @@ class ambeIPSC(IPSC):
     _tx_tg = hex_str_3(9998)                            # Hard code the destination TG.  This ensures traffic will not show up on DMR-MARC
     _tx_ts = 2                                          # Time Slot 2
     _currentNetwork = ""
+    _dmrgui = ''
     
     ###### DEBUGDEBUGDEBUG
     #_d = None
@@ -208,8 +208,6 @@ class ambeIPSC(IPSC):
         if (time() - self._busy_slots[_newSlot]) >= 0.10 :          # slot is not busy so it is safe to transmit
             # Send the packet to all peers in the target IPSC
             self.send_to_ipsc(_frame)
-            #self.transport.write(_frame, ('192.168.1.50', 50099))
-            self.transport.write(_frame, ('167.88.213.36', 50249))
         else:
             logger.info('Slot {} is busy, will not transmit packet from gateway'.format(_newSlot))
 
@@ -253,6 +251,8 @@ class ambeIPSC(IPSC):
             if _ambe:
                 _ambe1 = BitArray('0x'+h(_ambe[0:49]))
                 _ambeAll += _ambe1[0:50]    # Append the 49 bits to the string
+            else:
+                break
         return _ambeAll.tobytes()           # Return the 49 * 3 as an array of bytes
 
     # Set up the socket and run the method to gather the AMBE.  Sending it to all peers
@@ -263,7 +263,10 @@ class ambeIPSC(IPSC):
         while (1):                          # Forever!
             s.listen(5)                     # Now wait for client connection.
             _sock, addr = s.accept()        # Establish connection with client.
-            self.playbackFromUDP(_sock, _network)
+            if int_id(self._tx_tg) > 0:     # Test if we are allowed to transmit
+                self.playbackFromUDP(_sock, _network)
+            else:
+                transmitDisabled(sock, _network)    #tg is zero, so just eat the network trafic
             _sock.close()
 
     # This represents a full transmission (HEAD, VOICE and TERM)
@@ -322,7 +325,13 @@ class ambeIPSC(IPSC):
             logger.error('Can not transmit to peers')
         logger.info('Transmit complete')
 
-    # Debug method used to test the AMBE code.  
+    def transmitDisabled(self, _sock, _network):
+        _eof = False
+        while(_eof == False):
+            if self.readAmbeFrameFromUDP(_sock) == None:
+                _eof = True                             # There are no more AMBE frames, so terminate the loop
+
+    # Debug method used to test the AMBE code.
     def playbackFromFile(self, _fileName):
         _r = open(_fileName, 'rb')
         _eof = False
@@ -396,6 +405,8 @@ class ambeIPSC(IPSC):
                 if self._currentTG == self._no_tg:
                     _src_sub    = get_subscriber_info(_src_sub)
                     logger.info('Voice Transmission Start on TS {} and TG {} ({}) from {}'.format(_ts, _dst_sub, _tg_id, _src_sub))
+                    self._sock.sendto('reply log2 {} {}'.format(_src_sub, _tg_id), (self._dmrgui, 34003))
+
                     self._currentTG = _tg_id
                     self._transmitStartTime = time()
                     self._start_seq = int_id(_data[20:22])
@@ -416,7 +427,13 @@ class ambeIPSC(IPSC):
                         _lost_percentage = 100.0 - ((self._packet_count / float(_source_packets)) * 100.0)
                     else:
                         _lost_percentage = 0.0
-                    logger.info('Voice Transmission End {:.2f} seconds loss rate: {:.2f}% ({}/{})'.format((time() - self._transmitStartTime), _lost_percentage, _source_packets - self._packet_count, _source_packets))
+                    _duration = (time() - self._transmitStartTime)
+                    logger.info('Voice Transmission End {:.2f} seconds loss rate: {:.2f}% ({}/{})'.format(_duration, _lost_percentage, _source_packets - self._packet_count, _source_packets))
+                    self._sock.sendto("reply log" +
+                                      strftime(" %m/%d/%y %H:%M:%S", localtime(self._transmitStartTime)) +
+                                      ' {} {} "{}"'.format(get_subscriber_info(_src_sub), _ts, _dst_sub) +
+                                      ' {:.2f}%'.format(_lost_percentage) +
+                                      ' {:.2f}s'.format(_duration), (self._dmrgui, 34003))
                     self._currentTG = self._no_tg
                 if _payload_type == BURST_DATA_TYPE['SLOT1_VOICE']:
                     self.outputFrames(_ambe_frames, _ambe_frame1, _ambe_frame2, _ambe_frame3)
@@ -474,6 +491,7 @@ class ambeIPSC(IPSC):
         while True:
             c, addr = s.accept()     # Establish connection with client.
             logger.info( 'Got connection from {}'.format(addr) )
+            self._dmrgui = addr[0]
             _tmp = c.recv(1024)
             _tmp = _tmp.split(None)[0] #first get rid of whitespace
             _cmd = _tmp.split('=')[0]
@@ -494,6 +512,12 @@ class ambeIPSC(IPSC):
                 elif _cmd == 'gateway_dmr_id':
                     self._gateway_dmr_id = int(_tmp.split('=')[1])
                     print('New gateway_dmr_id = ' + str(self._gateway_dmr_id))
+                elif _cmd == 'gateway_peer_id':
+                    peerID = int(_tmp.split('=')[1])
+                    NETWORK[_network]['LOCAL']['RADIO_ID'] = hex_str_3(peerID)
+                    print('New peer_id = ' + str(peerID))
+                elif _cmd == 'restart':
+                    reactor.callFromThread(reactor.stop)
                 elif _cmd == 'playbackFromFile':
                     self.playbackFromFile('ambe.bin')                
                 elif _cmd == 'tgs':
@@ -502,6 +526,22 @@ class ambeIPSC(IPSC):
                     logger.info( 'New TGs={}'.format(self._tg_filter) )
                 elif _cmd == 'dump_template':
                     self.dumpTemplate('PrivateVoice.bin')
+                elif _cmd == 'get_info':
+                    self._sock.sendto('reply dmr_info {} {} {} {}'.format(self._currentNetwork,
+                                                                          int_id(NETWORK[self._currentNetwork]['LOCAL']['RADIO_ID']),
+                                                                          self._gateway_dmr_id,
+                                                                          get_subscriber_info(hex_str_3(self._gateway_dmr_id))), (self._dmrgui, 34003))
+                elif _cmd == 'eval':
+                    _sz = len(_tmp)-5
+                    _evalExpression = _tmp[-_sz:]
+                    _evalResult = eval(_evalExpression)
+                    print("eval of {} is {}".format(_evalExpression, _evalResult))
+                    self._sock.sendto('reply eval {}'.format(_evalResult), (self._dmrgui, 34003))
+                elif _cmd == 'exec':
+                    _sz = len(_tmp)-5
+                    _evalExpression = _tmp[-_sz:]
+                    exec(_evalExpression)
+                    print("exec of {}".format(_evalExpression))
                 else:
                     logger.error('Unknown command')
             c.close()                # Close the connection
