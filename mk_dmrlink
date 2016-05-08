@@ -6,38 +6,38 @@
 #                                               #
 #################################################
 
-apt-get install unzip -y
-apt-get install python-twisted -y
+# apt-get install unzip -y
+# apt-get install python-twisted -y
 
 # To allow multiple instances of DMRlink to run
 # You need multiple ipsc directories, dmrlink.py and dmrlink.cfg
 # The needed files are copied to /opt/dmrlink
 
 # Make needed directories
-mkdir -p /opt/dmrlink/ambe_audio/ipsc
-mkdir -p /opt/dmrlink/bridge/ipsc
-mkdir -p /opt/dmrlink/gateway/ipsc
-mkdir -p /opt/dmrlink/log/ipsc
-mkdir -p /opt/dmrlink/playback/ipsc
-mkdir -p /opt/dmrlink/play_group/ipsc
-mkdir -p /opt/dmrlink/record/ipsc
-mkdir -p /opt/dmrlink/rcm/ipsc
-mkdir -p /opt/dmrlink/doc
-mkdir -p /opt/dmrlink/samples
-mkdir -p /var/log/dmrlink
+#mkdir -p /opt/dmrlink/ambe_audio/ipsc
+#mkdir -p /opt/dmrlink/bridge/ipsc
+#mkdir -p /opt/dmrlink/gateway/ipsc
+#mkdir -p /opt/dmrlink/log/ipsc
+#mkdir -p /opt/dmrlink/playback/ipsc
+#mkdir -p /opt/dmrlink/play_group/ipsc
+#mkdir -p /opt/dmrlink/record/ipsc
+#mkdir -p /opt/dmrlink/rcm/ipsc
+#mkdir -p /opt/dmrlink/doc
+#mkdir -p /opt/dmrlink/samples
+#mkdir -p /var/log/dmrlink
 
 # Put scripts in /opt/dmrlink
-cp /srv/DMRlink/get_ids.sh /opt/dmrlink # should be linked to /etc/cron.daily
-cp /srv/DMRlink/init.d/bridge /opt/dmrlink/rc.bridge
+#cp /srv/DMRlink/get_ids.sh /opt/dmrlink # should be linked to /etc/cron.daily
+#cp /srv/DMRlink/init.d/bridge /opt/dmrlink/rc.bridge
 
 # bitstring install
 cd /opt/dmrlink
-wget https://pypi.python.org/packages/source/b/bitstring/bitstring-3.1.3.zip
-unzip bitstring-3.1.3.zip
-cd bitstring-3.1.3
+wget https://pypi.python.org/packages/source/b/bitstring/bitstring-3.1.4.tar.gz
+tar zxvf bitstring-3.1.4.tar.gz
+cd bitstring-3.1.4
 python setup.py install
 cd /opt/dmrlink
-rm bitstring-3.1.3.zip
+# rm bitstring-3.1.3.zip
 
 # Put common files in /opt/dmrlink
 cp /srv/DMRlink/subscriber_ids.csv /opt/dmrlink
