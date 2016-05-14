@@ -236,7 +236,7 @@ class ambeIPSC(IPSC):
     # Read bytes from the socket with "timeout"  I hate this code.
     def readSock( self, _sock, len ):
         counter = 0
-        while(counter < 10):
+        while(counter < 3):
             _ambe = _sock.recv(len)
             if _ambe: break
             sleep(0.1)
@@ -266,7 +266,7 @@ class ambeIPSC(IPSC):
             if int_id(self._tx_tg) > 0:     # Test if we are allowed to transmit
                 self.playbackFromUDP(_sock, _network)
             else:
-                transmitDisabled(sock, _network)    #tg is zero, so just eat the network trafic
+                self.transmitDisabled(_sock, _network)    #tg is zero, so just eat the network trafic
             _sock.close()
 
     # This represents a full transmission (HEAD, VOICE and TERM)
@@ -327,9 +327,13 @@ class ambeIPSC(IPSC):
 
     def transmitDisabled(self, _sock, _network):
         _eof = False
+        logger.debug('Transmit disabled begin')
         while(_eof == False):
-            if self.readAmbeFrameFromUDP(_sock) == None:
+            if self.readAmbeFrameFromUDP(_sock):
+                pass
+            else:
                 _eof = True                             # There are no more AMBE frames, so terminate the loop
+        logger.debug('Transmit disabled end')
 
     # Debug method used to test the AMBE code.
     def playbackFromFile(self, _fileName):
