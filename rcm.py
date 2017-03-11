@@ -43,7 +43,7 @@ class rcmIPSC(IPSC):
     
     def __init__(self, *args, **kwargs):
         IPSC.__init__(self, *args, **kwargs)
-        
+
     #************************************************
     #     CALLBACK FUNCTIONS FOR USER PACKET TYPES
     #************************************************
@@ -71,23 +71,23 @@ class rcmIPSC(IPSC):
         else:
             _rf_tgt = get_info(int_id(_rf_tgt), subscriber_ids)
         
-        print('Call Monitor - Call Status')
-        print('TIME:        ', datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
-        print('DATA SOURCE: ', _source)
-        print('IPSC:        ', _network)
-        print('IPSC Source: ', _ipsc_src)
-        print('Timeslot:    ', TS[_ts])
+        printAndLog('Call Monitor - Call Status')
+        printAndLog('TIME:        ', datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
+        printAndLog('DATA SOURCE: ', _source)
+        printAndLog('IPSC:        ', _network)
+        printAndLog('IPSC Source: ', _ipsc_src)
+        printAndLog('Timeslot:    ', TS[_ts])
         try:
-            print('Status:      ', STATUS[_status])
+            printAndLog('Status:      ', STATUS[_status])
         except KeyError:
-            print('Status (unknown): ', h(status))
+            printAndLog('Status (unknown): ', h(status))
         try:
-            print('Type:        ', TYPE[_type])
+            printAndLog('Type:        ', TYPE[_type])
         except KeyError:
-            print('Type (unknown): ', h(_type))
-        print('Source Sub:  ', _rf_src)
-        print('Target Sub:  ', _rf_tgt)
-        print()
+            printAndLog('Type (unknown): ', h(_type))
+        printAndLog('Source Sub:  ', _rf_src)
+        printAndLog('Target Sub:  ', _rf_tgt)
+        printAndLog()
     
     def call_mon_rpt(self, _network, _data):
         if not rpt:
@@ -98,19 +98,19 @@ class rcmIPSC(IPSC):
         
         _source = get_info(int_id(_source), peer_ids)
         
-        print('Call Monitor - Repeater State')
-        print('TIME:         ', datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
-        print('DATA SOURCE:  ', _source)
+        printAndLog('Call Monitor - Repeater State')
+        printAndLog('TIME:         ', datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
+        printAndLog('DATA SOURCE:  ', _source)
      
         try:
-            print('TS1 State:    ', REPEAT[_ts1_state])
+            printAndLog('TS1 State:    ', REPEAT[_ts1_state])
         except KeyError:
-            print('TS1 State (unknown): ', h(_ts1_state))
+            printAndLog('TS1 State (unknown): ', h(_ts1_state))
         try:
-            print('TS2 State:    ', REPEAT[_ts2_state])
+            printAndLog('TS2 State:    ', REPEAT[_ts2_state])
         except KeyError:
-            print('TS2 State (unknown): ', h(_ts2_state))
-        print()
+            printAndLog('TS2 State (unknown): ', h(_ts2_state))
+        printAndLog()
             
     def call_mon_nack(self, _network, _data):
         if not nack:
@@ -120,20 +120,20 @@ class rcmIPSC(IPSC):
         
         _source = get_info(int_id(_source), peer_ids)
         
-        print('Call Monitor - Transmission NACK')
-        print('TIME:        ', datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
-        print('DATA SOURCE: ', _source)
+        printAndLog('Call Monitor - Transmission NACK')
+        printAndLog('TIME:        ', datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
+        printAndLog('DATA SOURCE: ', _source)
         try:
-            print('NACK Cause:  ', NACK[_nack])
+            printAndLog('NACK Cause:  ', NACK[_nack])
         except KeyError:
-            print('NACK Cause (unknown): ', h(_nack))
-        print()
+            printAndLog('NACK Cause (unknown): ', h(_nack))
+        printAndLog()
     
     def repeater_wake_up(self, _network, _data):
         _source = _data[1:5]
         _source_dec = int_id(_source)
         _source_name = get_info(_source_dec, peer_ids)
-        #print('({}) Repeater Wake-Up Packet Received: {} ({})' .format(_network, _source_name, _source_dec))
+        #printAndLog('({}) Repeater Wake-Up Packet Received: {} ({})' .format(_network, _source_name, _source_dec))
 
 
 if __name__ == '__main__':

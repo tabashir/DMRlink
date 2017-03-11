@@ -326,6 +326,12 @@ except ImportError:
 #     UTILITY FUNCTIONS FOR INTERNAL USE
 #************************************************
 
+# Print to console and log in one
+def printAndLog(message):
+		logger.info(message)
+		print(message)
+
+
 # Create a 2 byte hex string from an integer
 #
 def hex_str_2(_int_id):
@@ -549,14 +555,14 @@ def print_peer_list(_network):
     _peers = NETWORK[_network]['PEERS']
     
     _status = NETWORK[_network]['MASTER']['STATUS']['PEER_LIST']
-    #print('Peer List Status for {}: {}' .format(_network, _status))
+    #printAndLog('Peer List Status for {}: {}' .format(_network, _status))
     
     if _status and not NETWORK[_network]['PEERS']:
-        print('We are the only peer for: %s' % _network)
-        print('')
+        printAndLog('We are the only peer for: %s' % _network)
+        printAndLog('')
         return
              
-    print('Peer List for: %s' % _network)
+    printAndLog('Peer List for: %s' % _network)
     for peer in _peers.keys():
         _this_peer = _peers[peer]
         _this_peer_stat = _this_peer['STATUS']
@@ -566,40 +572,40 @@ def print_peer_list(_network):
         else:
             me = ''
              
-        print('\tRADIO ID: {} {}' .format(int(h(peer), 16), me))
-        print('\t\tIP Address: {}:{}' .format(_this_peer['IP'], _this_peer['PORT']))
+        printAndLog('\tRADIO ID: {} {}' .format(int(h(peer), 16), me))
+        printAndLog('\t\tIP Address: {}:{}' .format(_this_peer['IP'], _this_peer['PORT']))
         if _this_peer['MODE_DECODE'] and REPORTS['PEER_REPORT_INC_MODE']:
-            print('\t\tMode Values:')
+            printAndLog('\t\tMode Values:')
             for name, value in _this_peer['MODE_DECODE'].items():
-                print('\t\t\t{}: {}' .format(name, value))
+                printAndLog('\t\t\t{}: {}' .format(name, value))
         if _this_peer['FLAGS_DECODE'] and REPORTS['PEER_REPORT_INC_FLAGS']:
-            print('\t\tService Flags:')
+            printAndLog('\t\tService Flags:')
             for name, value in _this_peer['FLAGS_DECODE'].items():
-                print('\t\t\t{}: {}' .format(name, value))
-        print('\t\tStatus: {},  KeepAlives Sent: {},  KeepAlives Outstanding: {},  KeepAlives Missed: {}' .format(_this_peer_stat['CONNECTED'], _this_peer_stat['KEEP_ALIVES_SENT'], _this_peer_stat['KEEP_ALIVES_OUTSTANDING'], _this_peer_stat['KEEP_ALIVES_MISSED']))
-        print('\t\t                KeepAlives Received: {},  Last KeepAlive Received at: {}' .format(_this_peer_stat['KEEP_ALIVES_RECEIVED'], _this_peer_stat['KEEP_ALIVE_RX_TIME']))
+                printAndLog('\t\t\t{}: {}' .format(name, value))
+        printAndLog('\t\tStatus: {},  KeepAlives Sent: {},  KeepAlives Outstanding: {},  KeepAlives Missed: {}' .format(_this_peer_stat['CONNECTED'], _this_peer_stat['KEEP_ALIVES_SENT'], _this_peer_stat['KEEP_ALIVES_OUTSTANDING'], _this_peer_stat['KEEP_ALIVES_MISSED']))
+        printAndLog('\t\t                KeepAlives Received: {},  Last KeepAlive Received at: {}' .format(_this_peer_stat['KEEP_ALIVES_RECEIVED'], _this_peer_stat['KEEP_ALIVE_RX_TIME']))
         
-    print('')
+    printAndLog('')
  
-# Gratuitous print-out of Master info.. Pretty much debug stuff.
+# Gratuitous printAndLog-out of Master info.. Pretty much debug stuff.
 #
 def print_master(_network):
     if NETWORK[_network]['LOCAL']['MASTER_PEER']:
-        print('DMRlink is the Master for %s' % _network)
+        printAndLog('DMRlink is the Master for %s' % _network)
     else:
         _master = NETWORK[_network]['MASTER']
-        print('Master for %s' % _network)
-        print('\tRADIO ID: {}' .format(int(h(_master['RADIO_ID']), 16)))
+        printAndLog('Master for %s' % _network)
+        printAndLog('\tRADIO ID: {}' .format(int(h(_master['RADIO_ID']), 16)))
         if _master['MODE_DECODE'] and REPORTS['PEER_REPORT_INC_MODE']:
-            print('\t\tMode Values:')
+            printAndLog('\t\tMode Values:')
             for name, value in _master['MODE_DECODE'].items():
-                print('\t\t\t{}: {}' .format(name, value))
+                printAndLog('\t\t\t{}: {}' .format(name, value))
         if _master['FLAGS_DECODE'] and REPORTS['PEER_REPORT_INC_FLAGS']:
-            print('\t\tService Flags:')
+            printAndLog('\t\tService Flags:')
             for name, value in _master['FLAGS_DECODE'].items():
-                print('\t\t\t{}: {}' .format(name, value))
-        print('\t\tStatus: {},  KeepAlives Sent: {},  KeepAlives Outstanding: {},  KeepAlives Missed: {}' .format(_master['STATUS']['CONNECTED'], _master['STATUS']['KEEP_ALIVES_SENT'], _master['STATUS']['KEEP_ALIVES_OUTSTANDING'], _master['STATUS']['KEEP_ALIVES_MISSED']))
-        print('\t\t                KeepAlives Received: {},  Last KeepAlive Received at: {}' .format(_master['STATUS']['KEEP_ALIVES_RECEIVED'], _master['STATUS']['KEEP_ALIVE_RX_TIME']))
+                printAndLog('\t\t\t{}: {}' .format(name, value))
+        printAndLog('\t\tStatus: {},  KeepAlives Sent: {},  KeepAlives Outstanding: {},  KeepAlives Missed: {}' .format(_master['STATUS']['CONNECTED'], _master['STATUS']['KEEP_ALIVES_SENT'], _master['STATUS']['KEEP_ALIVES_OUTSTANDING'], _master['STATUS']['KEEP_ALIVES_MISSED']))
+        printAndLog('\t\t                KeepAlives Received: {},  Last KeepAlive Received at: {}' .format(_master['STATUS']['KEEP_ALIVES_RECEIVED'], _master['STATUS']['KEEP_ALIVE_RX_TIME']))
 
 # Shut ourselves down gracefully with the IPSC peers.
 #
