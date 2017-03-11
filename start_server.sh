@@ -19,7 +19,8 @@ function check_progs {
 }
 
 # System packages
-check_progs "python2 pip virtualenv multilog"
+check_progs "python2 pip virtualenv"
+# check_progs "python2 pip virtualenv multilog"
 
 # Python packages
 source dmr_libs/bin/activate
@@ -33,5 +34,5 @@ debug_echo "ABS_PATH: $ABS_PATH"
 debug_echo "BASE_PATH: $BASE_PATH"
 
 cd $BASE_PATH
-supervisord -c supervisord.conf -n
+supervisord -c supervisord.conf
 
