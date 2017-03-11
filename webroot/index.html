@@ -1,0 +1,42 @@
+<!doctype html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<title>DMRLink Status Page</title>
+	</head>
+	<body>
+		<script src="jquery-3.1.1.js"></script>
+		<h1>DMRLink Status Page </h1>	
+		<div>
+			<h2>Current Registered Devices</h2>	
+			<pre id='registeredDevices'></pre>
+		</div>
+		<div>
+			<h2>System Log</h2>	
+			<pre id='systemLog'></pre>
+		</div>
+		<script>
+			function getLog(logFile, elementToFill){
+				$.ajax({
+					url: logFile,
+					dataType: 'text',
+					success: function(text){
+							$(elementToFill).text(text);
+					 }
+				});
+			}
+
+			$( document ).ready(function(){
+				$.ajaxSetup({
+						cache: false
+				});
+
+				setInterval(function() {
+					getLog('dmrs.log', '#registeredDevices');
+					getLog('system.log', '#systemLog');
+					}, 7000);
+			});
+
+		</script>
+	</body>
+</html>

@@ -1,0 +1,30 @@
+        RADIO ID: 12345 (self)
+                IP Address: 79.73.232.28:51909
+                Status: False,  KeepAlives Sent: 0,  KeepAlives Outstanding: 0,  KeepAlives Missed: 0
+                                KeepAlives Received: 0,  Last KeepAlive Received at: 0
+        RADIO ID: 235107
+                IP Address: 86.31.138.36:50500
+                Status: False,  KeepAlives Sent: 0,  KeepAlives Outstanding: 0,  KeepAlives Missed: 0
+                                KeepAlives Received: 0,  Last KeepAlive Received at: 1488590102
+        RADIO ID: 235303
+                IP Address: 84.93.67.21:50500
+                Status: True,  KeepAlives Sent: 49,  KeepAlives Outstanding: 1,  KeepAlives Missed: 0
+                                KeepAlives Received: 48,  Last KeepAlive Received at: 1488590101
+        RADIO ID: 1234
+                IP Address: 84.252.254.223:50500
+                Status: False,  KeepAlives Sent: 0,  KeepAlives Outstanding: 0,  KeepAlives Missed: 0
+                                KeepAlives Received: 0,  Last KeepAlive Received at: 1488590102
+        RADIO ID: 235298
+                IP Address: 89.145.214.114:54422
+                Status: False,  KeepAlives Sent: 0,  KeepAlives Outstanding: 0,  KeepAlives Missed: 0
+                                KeepAlives Received: 0,  Last KeepAlive Received at: 1488590102
+        RADIO ID: 235299
+                IP Address: 188.31.130.79:50500
+                Status: True,  KeepAlives Sent: 49,  KeepAlives Outstanding: 1,  KeepAlives Missed: 0
+                                KeepAlives Received: 48,  Last KeepAlive Received at: 1488590101
+
+Master for IPSC1
+        RADIO ID: 235106
+                Status: True,  KeepAlives Sent: 53,  KeepAlives Outstanding: 1,  KeepAlives Missed: 0
+                                KeepAlives Received: 52INFO (IPSC1) Peer List Received from Master: 7 peers in this IPSC
+
