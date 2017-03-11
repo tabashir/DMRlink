@@ -84,7 +84,13 @@ try:
             LOGGER = {
                 'LOG_FILE': config.get(section, 'LOG_FILE'),
                 'LOG_HANDLERS': config.get(section, 'LOG_HANDLERS'),
-                'LOG_LEVEL': config.get(section, 'LOG_LEVEL')
+                'LOG_LEVEL': config.get(section, 'LOG_LEVEL'),
+                'LOG_ROTATE_SIZE_FORMATTER': config.get(section, 'LOG_ROTATE_SIZE_FORMATTER'),
+                'LOG_ROTATE_SIZE_BYTES': config.get(section, 'LOG_ROTATE_SIZE_BYTES'),
+                'LOG_ROTATE_SIZE_BACKUP_COUNT': config.get(section, 'LOG_ROTATE_SIZE_BACKUP_COUNT'),
+                'LOG_ROTATE_TIMER_FORMATTER': config.get(section, 'LOG_ROTATE_TIMER_FORMATTER'),
+                'LOG_ROTATE_TIMER_SECONDS': config.get(section, 'LOG_ROTATE_TIMER_SECONDS'),
+                'LOG_ROTATE_TIMER_BACKUP_COUNT': config.get(section, 'LOG_ROTATE_TIMER_BACKUP_COUNT')
             }
         else:
             # All other sections define indiviual IPSC Networks we connect to
@@ -233,6 +239,21 @@ dictConfig({
             'class': 'logging.FileHandler',
             'formatter': 'timed',
             'filename': LOGGER['LOG_FILE'],
+        },
+        'rotate-size': {
+            'class': 'logging.handlers.RotatingFileHandler',
+            'filename': LOGGER['LOG_FILE'],
+            'formatter': LOGGER['LOG_ROTATE_SIZE_FORMATTER'],
+            'maxBytes': LOGGER['LOG_ROTATE_SIZE_BYTES'],
+            'backupCount': LOGGER['LOG_ROTATE_SIZE_BACKUP_COUNT'],
+        },
+        'rotate-timer': {
+            'class': 'logging.handlers.TimedRotatingFileHandler',
+            'filename': LOGGER['LOG_FILE'],
+            'formatter': LOGGER['LOG_ROTATE_TIMER_FORMATTER'],
+            'when': 'S',
+            'interval': int(LOGGER['LOG_ROTATE_TIMER_SECONDS']),
+            'backupCount': LOGGER['LOG_ROTATE_TIMER_BACKUP_COUNT'],
         },
         'syslog': {
             'class': 'logging.handlers.SysLogHandler',
