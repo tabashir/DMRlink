@@ -10,3 +10,4 @@ playback_config.py
 *.bak
 *.lcl
 *.log
+csv_files
