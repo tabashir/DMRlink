@@ -13,3 +13,4 @@ playback_config.py
 *.log.*
 csv_files
 tmp
+dmr_libs
