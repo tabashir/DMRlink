@@ -6,7 +6,10 @@
 	</head>
 	<body>
 		<script src="jquery-3.1.1.js"></script>
-		<h1>DMRLink Status Page </h1>	
+		<h1>DMRLink Status Page</h1>	
+		<div>
+			Time: <span id='currentTime'></span>
+		</div>
 		<div>
 			<h2>Current Registered Devices</h2>	
 			<pre id='registeredDevices'></pre>
@@ -30,10 +33,14 @@
 				$.ajaxSetup({
 						cache: false
 				});
+				$('#currentTime').text( new Date().toUTCString() );
+				getLog('dmrs.log', '#registeredDevices');
 
 				setInterval(function() {
 					getLog('dmrs.log', '#registeredDevices');
 					getLog('system.log', '#systemLog');
+					var d = new Date();
+					$('#currentTime').text( new Date().toUTCString() );
 					}, 7000);
 			});
 
