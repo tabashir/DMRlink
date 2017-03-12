@@ -15,6 +15,10 @@
 			<pre id='registeredDevices'></pre>
 		</div>
 		<div>
+			<h2>Last Regisration Requests</h2>	
+			<pre id='registrationRequests'></pre>
+		</div>
+		<div>
 			<h2>System Log</h2>	
 			<pre id='systemLog'></pre>
 		</div>
@@ -35,12 +39,14 @@
 				});
 				$('#currentTime').text( new Date().toUTCString() );
 				getLog('dmrs.log', '#registeredDevices');
+				getLog('registrations.log', '#registrationRequests');
 
 				setInterval(function() {
 					getLog('dmrs.log', '#registeredDevices');
+          getLog('registrations.log', '#registrationRequests');
 					getLog('system.log', '#systemLog');
 					$('#currentTime').text( new Date().toUTCString() );
-					}, 7000);
+					}, 5000);
 			});
 
 		</script>
